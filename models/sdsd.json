@@ -1,0 +1,58 @@
+{
+    "_id": "5be94b6157340c1af0b724ec",
+    "tenantId": "395",
+    "propertyId": "alpha",
+    "appName": "wbe",
+    "uiPermissions": {
+        "routePermissions": {
+            "offers": true,
+            "rooms": true,
+            "enhancements": true,
+            "book": true,
+            "calendar": false,
+            "confirmation": true,
+            "reservation": true
+        },
+        "functionalPermissions": {
+            "casinoPlayerLogin": {
+                "playerLoginAccess": true,
+                "validationRequired": true,
+                "secondaryGuestAsPlayer": {
+                    "playerAccess": true,
+                    "validationRequired": true
+                }
+            },
+            "offerCode": {
+                "offerCodeRoomsPage": true,
+                "offerCodeCalendarPage": true,
+                "offerDetailsCalendarPage": true,
+                "offerDetailsRoomsPage": true,
+                "calendarName": true,
+                "offerCodeCalendarPageHeader": true,
+                "offerCodeCart": true,
+                "offerCodeGuestDetails": true,
+                "offerCodeReservationPage": true,
+                "offerCodeConfirmationPage": true
+            },
+            "casinoNumber": {
+                "casinoNumberRoomsPage": true,
+                "casinoNumberCalendarPage": true,
+                "casinoPlayerRankCard": true,
+                "casinoNumberGuestInfoPage": true
+            },
+            "casinoOffers": true,
+            "bestOffers": true,
+            "addGuestButton": true,
+            "currencyConverter": true,
+            "rGuestPayIframe": true,
+            "addToCart": true,
+            "flexibleDates": {
+                "flexibleDatesMenuHeaderPage": true,
+                "flexibleDatesRoomsBtnRoomsPage": true
+            },
+            "stayEnhancements": {
+                "stayEnhancementsAvailable": true
+            }
+        }
+    }
+}
