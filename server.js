@@ -2,15 +2,19 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
-import tenantPropUiConfig from './models/Issue';
 import login from './models/login';
 import admin from './models/admin';
 import doctor from './models/doctor';
+import doctorList from './models/doctorList';
+import patientList from './models/patientList';
 import patient from './models/patient';
-import AzureAccountDetails from './models/accountDetails'
+import questions from './models/questions';
+
+
 const app = express();
 const router = express.Router();
-const translate = require('@k3rn31p4nic/google-translate-api');
+
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(function (req, res, next) {
@@ -18,24 +22,14 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
-mongoose.connect('mongodb://localhost:27017/admin');
 
+mongoose.connect('mongodb://localhost:27017/ngo');
 const connection = mongoose.connection;
 
 connection.once('open', () => {
     console.log('MongoDB database connection established successfully!');
 });
 
-router.route('/issues').get((req, res) => {
-    tenantPropUiConfig.find((err, issues) => {
-        if (err)
-            console.log(err);
-        else {
-            res.json(issues);
-        }
-
-    });
-});
 router.route('/login').post((req, res) => {
     console.log(req.body);
     login.find(
@@ -43,11 +37,12 @@ router.route('/login').post((req, res) => {
             userName: req.body.userName,
             role: req.body.role,
             password: req.body.password
-        },
+        }, { '_id': 0, 'password': 0 },
         (err, logindata) => {
             if (err)
                 console.log(err);
             else {
+                console.log(logindata);
                 if (logindata.length >= 1) {
                     let data1 = logindata[0];
                     res.send({
@@ -64,13 +59,389 @@ router.route('/login').post((req, res) => {
                         success: false
                     })
                 }
-
-
             }
-
         });
 });
+router.route('/resetPassword').post((req, res) => {
+    console.log(req.body);
+    if (req.body.role == 'doctor') {
+        doctor.findOneAndUpdate(
+            {
+                userName: req.body.userName,
+                role: req.body.role,
+                password: req.body.oldPassword
+            }, { password: req.body.newPassword, resetRequired: false },{new: true},
+            (err, logindata) => {
+                if (err)
+                    console.log(err);
+                else {
+                    console.log(logindata);
+                    if (logindata) {
+                        let data1 = logindata;
+                        res.send({
+                            userName: data1.userName,
+                            firstName: data1.firstName,
+                            lastName: data1.lastName,
+                            resetRequired: data1.resetRequired,
+                            permissions: data1.permissions,
+                            success: true,
+                            role: data1.role
+                        });
+                    }
+                    else {
+                        res.json({
+                            success: false
+                        })
+                    }
+                }
+            });
+    }
+    else if (req.body.role == 'patient') {
+        patient.findOneAndUpdate(
+            {
+                userName: req.body.userName,
+                role: req.body.role,
+                password: req.body.oldPassword
+            }, { password: req.body.newPassword, resetRequired: false },{new: true},
+            (err, logindata) => {
+                if (err)
+                    console.log(err);
+                else {
+                    console.log(logindata);
+                    if (logindata) {
+                        let data1 = logindata;
+                        res.send({
+                            userName: data1.userName,
+                            resetRequired: data1.resetRequired,
+                            firstName: data1.firstName,
+                            lastName: data1.lastName,
+                            permissions: data1.permissions,
+                            success: true,
+                            role: data1.role
+                        });
+                    }
+                    else {
+                        res.json({
+                            success: false
+                        })
+                    }
+                }
+            });
+    }
+    else if (req.body.role == "admin") {
+        admin.findOneAndUpdate(
+            {
+                userName: req.body.userName,
+                role: req.body.role,
+                password: req.body.oldPassword
+            }, { password: req.body.newPassword, resetRequired: false },{new: true},
+            (err, logindata) => {
+                if (err)
+                    console.log(err);
+                else {
+                    console.log(logindata);
+                    if (logindata) {
+                        let data1 = logindata;
+                        res.send({
+                            userName: data1.userName,
+                            firstName: data1.firstName,
+                            lastName: data1.lastName,
+                            resetRequired: data1.resetRequired,
+                            permissions: data1.permissions,
+                            success: true,
+                            role: data1.role
+                        });
+                    }
+                    else {
+                        res.json({
+                            success: false
+                        })
+                    }
+                }
+            });
+    }
+});
+router.route('/editUser').post((req, res) => {
+    console.log(req.body.data1);
+    if (req.body.data1.role == 'doctor') {
+        doctor.findOneAndUpdate(
+            {
+                userName: req.body.data1.userName,
+                role: req.body.data1.role,
+                userId: req.body.data1.userId
+            }, req.body.data1,{new: true},
+            (err, logindata) => {
+                if (err)
+                    console.log(err);
+                else {
+                    console.log(logindata);
+                    if (logindata) {
+                        let data1 = logindata;
+                        res.send({
+                            userName: data1.userName,
+                            firstName: data1.firstName,
+                            lastName: data1.lastName,
+                            resetRequired: data1.resetRequired,
+                            permissions: data1.permissions,
+                            success: true,
+                            role: data1.role
+                        });
+                    }
+                    else {
+                        res.json({
+                            success: false
+                        })
+                    }
+                }
+            });
+    }
+    else if (req.body.data1.role == 'patient') {
+        patient.findOneAndUpdate(
+            {
+                userName: req.body.data1.userName,
+                role: req.body.data1.role,
+                userId: req.body.data1.userId
+            }, req.body.data1,{new: true},
+            (err, logindata) => {
+                if (err)
+                    console.log(err);
+                else {
+                    console.log(logindata);
+                    if (logindata) {
+                        let data1 = logindata;
+                        res.send({
+                            userName: data1.userName,
+                            resetRequired: data1.resetRequired,
+                            firstName: data1.firstName,
+                            lastName: data1.lastName,
+                            permissions: data1.permissions,
+                            success: true,
+                            role: data1.role
+                        });
+                    }
+                    else {
+                        res.json({
+                            success: false
+                        })
+                    }
+                }
+            });
+    }
+    else if (req.body.data1 .role == "admin") {
+        admin.findOneAndUpdate(
+            {
+                userName: req.body.data1.userName,
+                role: req.body.data1.role,
+                userId: req.body.data1.userId
+            }, req.body.data1,{new: true},
+            (err, logindata) => {
+                if (err)
+                    console.log(err);
+                else {
+                    console.log(logindata);
+                    if (logindata) {
+                        let data1 = logindata;
+                        res.send({
+                            userName: data1.userName,
+                            firstName: data1.firstName,
+                            lastName: data1.lastName,
+                            resetRequired: data1.resetRequired,
+                            permissions: data1.permissions,
+                            success: true,
+                            role: data1.role
+                        });
+                    }
+                    else {
+                        res.json({
+                            success: false
+                        })
+                    }
+                }
+            });
+    }
+});
 
+router.route('/deleteUser').post((req, res) => {
+    console.log(req.body.data1);
+    if (req.body.data1.role == 'doctor') {
+        doctor.findOneAndDelete(
+            {
+                userName: req.body.data1.userName,
+                role: req.body.data1.role,
+                userId: req.body.data1.userId
+            },
+            (err, logindata) => {
+                if (err)
+                    console.log(err);
+                else {
+                    console.log(logindata);
+                    if (logindata) {
+                        let data1 = logindata;
+                        res.send({                            
+                            success: true,
+                        });
+                    }
+                    else {
+                        res.json({
+                            success: false
+                        })
+                    }
+                }
+            });
+    }
+    else if (req.body.data1.role == 'patient') {
+        patient.findOneAndDelete(
+            {
+                userName: req.body.data1.userName,
+                role: req.body.data1.role,
+                userId: req.body.data1.userId
+            },
+            (err, logindata) => {
+                if (err)
+                    console.log(err);
+                else {
+                    console.log(logindata);
+                    if (logindata) {
+                        let data1 = logindata;
+                        res.send({
+                            success: true,
+                        });
+                    }
+                    else {
+                        res.json({
+                            success: false
+                        })
+                    }
+                }
+            });
+    }
+    else if (req.body.data1 .role == "admin") {
+        admin.findOneAndDelete(
+            {
+                userName: req.body.data1.userName,
+                role: req.body.data1.role,
+                userId: req.body.data1.userId
+            },
+            (err, logindata) => {
+                if (err)
+                    console.log(err);
+                else {
+                    console.log(logindata);
+                    if (logindata) {
+                        let data1 = logindata;
+                        res.send({
+                            success: true,
+                        });
+                    }
+                    else {
+                        res.json({
+                            success: false
+                        })
+                    }
+                }
+            });
+    }
+});
+
+router.route('/doctorlogin').post((req, res) => {
+    console.log(req.body);
+    doctor.find(
+        {
+            userName: req.body.userName,
+            role: req.body.role,
+            password: req.body.password
+        }, { '_id': 0, 'password': 0 },
+        (err, logindata) => {
+            if (err)
+                console.log(err);
+            else {
+                console.log(logindata);
+                if (logindata.length >= 1) {
+                    let data1 = logindata[0];
+                    res.send({
+                        userName: data1.userName,
+                        firstName: data1.firstName,
+                        lastName: data1.lastName,
+                        permissions: data1.permissions,
+                        resetRequired: data1.resetRequired,
+                        success: true,
+                        role: data1.role
+                    });
+                }
+                else {
+                    res.json({
+                        success: false
+                    })
+                }
+            }
+        });
+});
+router.route('/adminlogin').post((req, res) => {
+    console.log(req.body);
+    admin.find(
+        {
+            userName: req.body.userName,
+            role: req.body.role,
+            password: req.body.password
+        }, { '_id': 0, 'password': 0 },
+        (err, logindata) => {
+            if (err)
+                console.log(err);
+            else {
+                console.log(logindata);
+                if (logindata.length >= 1) {
+                    let data1 = logindata[0];
+                    res.send({
+                        userName: data1.userName,
+                        firstName: data1.firstName,
+                        lastName: data1.lastName,
+                        resetRequired: data1.resetRequired,
+                        permissions: data1.permissions,
+                        success: true,
+                        role: data1.role
+                    });
+                }
+                else {
+                    res.json({
+                        success: false
+                    })
+                }
+            }
+        });
+});
+router.route('/patientlogin').post((req, res) => {
+    console.log(req.body);
+    patient.find(
+        {
+            userName: req.body.userName,
+            role: req.body.role,
+            password: req.body.password
+        }, { '_id': 0, 'password': 0 },
+        (err, logindata) => {
+            if (err)
+                console.log(err);
+            else {
+                console.log(logindata);
+                if (logindata.length >= 1) {
+                    let data1 = logindata[0];
+                    res.send({
+                        userName: data1.userName,
+                        firstName: data1.firstName,
+                        resetRequired: data1.resetRequired,
+                        lastName: data1.lastName,
+                        permissions: data1.permissions,
+                        success: true,
+                        role: data1.role
+                    });
+                }
+                else {
+                    res.json({
+                        success: false
+                    })
+                }
+            }
+        });
+});
 
 router.route('/newUser').post((req, res) => {
     console.log(req.body);
@@ -103,10 +474,18 @@ router.route('/newUser').post((req, res) => {
                 if (err)
                     console.log(err);
                 else {
-
-                    res.send({
-                        success: true,
-                    });
+                    var data = req.body.data1;
+                    data.consultationHistory = ['NA'];
+                    data.nextInLine = ['NA'];
+                    doctorList.create(data, (err, response) => {
+                        if (err)
+                            console.log(err);
+                        else {
+                            res.send({
+                                success: true
+                            })
+                        }
+                    })
 
                 }
 
@@ -119,9 +498,21 @@ router.route('/newUser').post((req, res) => {
                 if (err)
                     console.log(err);
                 else {
-                    res.send({
-                        success: true,
-                    });
+                    var data = req.body.data1;
+                    data.lastVisitedDate = 'NA';
+                    data.nextAppointmentDate = 'NA';
+                    data.nextAppointmentDoctor = 'NA';
+                    data.lastVisitedDoctor = 'NA';
+                    data.visitedHistory = ['NA']
+                    patientList.create(data, (err, response) => {
+                        if (err)
+                            console.log(err);
+                        else {
+                            res.send({
+                                success: true
+                            })
+                        }
+                    })
                 }
 
             });
@@ -155,107 +546,130 @@ router.route('/admin').get((req, res) => {
     })
 });
 
-router.route('/getMessages/:id').get((req, res) => {
-    UIMessages.findById(req.params.id, (err, issue) => {
+router.route('/patient').get((req, res) => {
+    console.log(req.body);
+    patient.find({}, { '_id': 0, 'password': 0 }, function (err, patient) {
         if (err)
             console.log(err);
-        else
-            res.json(issue);
-    });
-});
-
-router.route('/azureAccountDetails').get((req, res) => {
-    AzureAccountDetails.find((err, issue) => {
-        if (err)
-            console.log(err);
-        else
-            res.json(issue);
-    });
-});
-
-router.route('/UIMessages/update/:id').post((req, res) => {
-    UIMessages.findById(req.params.id, (err, issue) => {
-        if (!issue)
-            return next(new Error('Could not load document'));
         else {
-            issue.uiMessages = req.body;
-            issue.save().then(issue => {
-                res.json('Messages Updated Successfully');
-            }).catch(err => {
-                res.status(400).send('Update failed');
-            });
+            let dataSend = patient;
+            // console.log("admin",admin[1]._doc);
+            res.send(dataSend);
         }
-    });
-});
-
-
-
-router.route('/translate').post((req, resp) => {
-    let translateData = req.body.message;
-    let keys = req.body.keys;
-    let fromLang = req.body.from;
-    let toLang = req.body.to;
-    translateDataFun(translateData, keys, fromLang, toLang).then(res => {
-        resp.json(res);
     })
 });
 
-
-
-router.route('/issues/:id').get((req, res) => {
-    tenantPropUiConfig.findById(req.params.id, (err, issue) => {
+router.route('/patientList').get((req, res) => {
+    console.log(req.body);
+    patientList.find({}, function (err, patient) {
         if (err)
             console.log(err);
-        else
-            res.json(issue);
-    });
-});
-
-router.route('/issues/update/:id').post((req, res) => {
-    tenantPropUiConfig.findById(req.params.id, (err, issue) => {
-        if (!issue)
-            return next(new Error('Could not load document'));
         else {
-            issue.uiPermissions = req.body;
-            issue.save().then(issue => {
-                res.json('Update done');
-            }).catch(err => {
-                res.status(400).send('Update failed');
-            });
+            let dataSend = patient;
+            // console.log("admin",admin[1]._doc);
+            res.send(dataSend);
         }
-    });
+    })
 });
 
-router.route('/issues/delete/:id').get((req, res) => {
-    Issue.findByIdAndRemove({ _id: req.params.id }, (err, issue) => {
+router.route('/doctorList').get((req, res) => {
+    console.log(req.body);
+    doctorList.find({}, function (err, doctor) {
         if (err)
-            res.json(err);
-        else
-            res.json('Remove successfully');
+            console.log(err);
+        else {
+            let dataSend = doctor;
+            // console.log("admin",admin[1]._doc);
+            res.send(dataSend);
+        }
     })
-})
+});
 
-async function translateDataFun(translateData, keys, fromLang, toLang) {
-    let primaryPromise = translateData.map(async (trans, index) => {
-        const response = await secondaryFunction(trans, index, keys, fromLang, toLang);
-        return response;
-    });
-    const varData = await Promise.all(primaryPromise);
-    return varData;
-}
-
-async function secondaryFunction(trans, index, keys, fromLang, toLang) {
-    let secondaryPromise = trans[keys[index]].map(async (transData) => {
-        const response = await translate(transData.defaultMessage, { from: fromLang, to: toLang }).then(res => {
-            return res.text
-        }).catch(err => {
-            console.error(err);
-        });
-        return response;
+router.route('/doctorListUpdate').post((req, res) => {
+    console.log(req.body);
+    let query = { userId: req.body.userId }
+    doctorList.findOneAndUpdate(query, req.body, { upsert: true, new: true }, function (err, doctor) {
+        if (err)
+            console.log(err);
+        else {
+            let dataSend = doctor;
+            // console.log("admin",admin[1]._doc);
+            res.send(dataSend);
+        }
     })
-    const varData = await Promise.all(secondaryPromise);
-    return varData;
-}
+});
+
+router.route('/patientListUpdate').post((req, res) => {
+    console.log(req.body);
+    let query = { userId: req.body.userId }
+    patientList.findOneAndUpdate(query, req.body, { upsert: true, new: true }, function (err, doctor) {
+        if (err)
+            console.log(err);
+        else {
+            let dataSend = doctor;
+            // console.log("admin",admin[1]._doc);
+            res.send(dataSend);
+        }
+    })
+});
+
+router.route('/getDoctorDetails').post((req, res) => {
+    console.log(req.body);
+    let query = { userId: req.body.doctorID }
+    doctorList.find(query, function (err, doctor) {
+        if (err)
+            console.log(err);
+        else {
+            let dataSend = doctor;
+            // console.log("admin",admin[1]._doc);
+            res.send(dataSend);
+        }
+    })
+});
+
+router.route('/getPatientDetails').post((req, res) => {
+    console.log(req.body);
+    let query = { userId: req.body.patientID }
+    patientList.find(query, function (err, patient) {
+        if (err)
+            console.log(err);
+        else {
+            let dataSend = patient;
+            // console.log("admin",admin[1]._doc);
+            res.send(dataSend);
+        }
+    })
+});
+
+router.route('/uploadQuestions').post((req, res) => {
+    console.log(req.body);
+    let query = { questionID: req.body.questionID };
+    let options = { upsert: true, setDefaultsOnInsert: true };
+    questions.findOneAndUpdate(query, req.body, options, function (err, question) {
+        if (err)
+            console.log(err);
+        else {
+            let dataSend = question;
+            // console.log("admin",admin[1]._doc);
+            res.send(dataSend);
+        }
+    })
+});
+
+router.route('/getQuestions').get((req, res) => {
+    console.log(req.body);
+    let query = { questionID: "1" };
+    questions.find(query, function (err, question) {
+        if (err)
+            console.log(err);
+        else {
+            let dataSend = question;
+            // console.log("admin",admin[1]._doc);
+            res.send(dataSend);
+        }
+    })
+});
+
 
 app.use('/', router);
 
