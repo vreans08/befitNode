@@ -51,7 +51,8 @@ router.route('/login').post((req, res) => {
                         lastName: data1.lastName,
                         permissions: data1.permissions,
                         success: true,
-                        role: data1.role
+                        role: data1.role,
+                        userId : data1.userId
                     });
                 }
                 else {
@@ -363,6 +364,7 @@ router.route('/doctorlogin').post((req, res) => {
                         firstName: data1.firstName,
                         lastName: data1.lastName,
                         permissions: data1.permissions,
+                        userId:data1.userId,
                         resetRequired: data1.resetRequired,
                         success: true,
                         role: data1.role
@@ -398,6 +400,7 @@ router.route('/adminlogin').post((req, res) => {
                         resetRequired: data1.resetRequired,
                         permissions: data1.permissions,
                         success: true,
+                        userId:data1.userId,
                         role: data1.role
                     });
                 }
@@ -429,6 +432,7 @@ router.route('/patientlogin').post((req, res) => {
                         firstName: data1.firstName,
                         resetRequired: data1.resetRequired,
                         lastName: data1.lastName,
+                        userId:data1.userId,
                         permissions: data1.permissions,
                         success: true,
                         role: data1.role

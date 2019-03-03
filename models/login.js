@@ -6,6 +6,7 @@ let login = new Schema({
    userName: String,
    role: String,
    firstName : String,
+   userId: String,
    lastName: String,
    password: String,
    permissions : Object,
