@@ -13,6 +13,15 @@ let patient = new Schema({
     email: String,
     resetRequired:Boolean,
     permissions : Object,
+    relationType: String,
+    relationName: String,
+    dob: String,
+    age: Number,
+    whatsapp: String,
+    referedBy: String,
+    address: String,
+    reason: String,
+    bloodgroup: String
 });
 
 export default mongoose.model('patient', patient, 'patient');
