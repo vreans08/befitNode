@@ -14,7 +14,26 @@ import questions from './models/questions';
 const app = express();
 const router = express.Router();
 
+const options = {
+    autoIndex: false, // Don't build indexes
+    reconnectTries: 30, // Retry up to 30 times
+    reconnectInterval: 500, // Reconnect every 500ms
+    poolSize: 10, // Maintain up to 10 socket connections
+    // If not connected, return errors immediately rather than waiting for reconnect
+    bufferMaxEntries: 0
+  }
 
+const connectWithRetry = () => {
+  console.log('MongoDB connection with retry')
+  mongoose.connect('mongodb+srv://bereadyadmin:bereadyadmin@bereadycluster-rkkrt.mongodb.net/ngo?retryWrites=true', options).then(()=>{
+    console.log('MongoDB is connected')
+  }).catch(err=>{
+    console.log('MongoDB connection unsuccessful, retry after 5 seconds.')
+    setTimeout(connectWithRetry, 5000)
+  })
+}
+
+connectWithRetry()
 app.use(cors());
 app.use(bodyParser.json());
 app.use(function (req, res, next) {
@@ -23,12 +42,12 @@ app.use(function (req, res, next) {
     next();
 });
 
-mongoose.connect('mongodb+srv://bereadyadmin:bereadyadmin@bereadycluster-rkkrt.mongodb.net/ngo?retryWrites=true');
-const connection = mongoose.connection;
+// mongoose.connect('mongodb+srv://bereadyadmin:bereadyadmin@bereadycluster-rkkrt.mongodb.net/ngo?retryWrites=true');
+// const connection = mongoose.connection;
 
-connection.once('open', () => {
-    console.log('MongoDB database connection established successfully!');
-});
+// connection.once('open', () => {
+//     console.log('MongoDB database connection established successfully!');
+// });
 
 router.route('/login').post((req, res) => {
     console.log(req.body);
