@@ -23,7 +23,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-mongoose.connect('mongodb://localhost:27017/ngo');
+mongoose.connect('mongodb+srv://bereadyadmin:bereadyadmin@bereadycluster-rkkrt.mongodb.net/ngo?retryWrites=true');
 const connection = mongoose.connection;
 
 connection.once('open', () => {
