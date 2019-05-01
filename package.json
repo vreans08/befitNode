@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "babel-watch server.js"
+    "dev": "babel-watch server.js",
+    "clean": "rm -rf build && mkdir build",
+    "build-babel": "babel -d ./build ./src -s",
+    "build": "npm run clean && npm run build-babel",
+"start": "npm run build && node ./build/index.js"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +24,7 @@
   "dependencies": {
     "@k3rn31p4nic/google-translate-api": "github:k3rn31p4nic/google-translate-api",
     "cors": "^2.8.5",
-    "express": "^4.16.3",
+    "express": "^4.16.4",
     "google-translate-api": "^2.3.0",
     "mongoose": "^5.1.6"
   },
