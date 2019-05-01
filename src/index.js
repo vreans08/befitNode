@@ -9,7 +9,7 @@ import doctorList from './models/doctorList';
 import patientList from './models/patientList';
 import patient from './models/patient';
 import questions from './models/questions';
-
+const PORT = process.env.PORT || 5000
 
 const app = express();
 const router = express.Router();
@@ -696,4 +696,4 @@ router.route('/getQuestions').get((req, res) => {
 
 app.use('/', router);
 
-app.listen(5600, () => console.log('Express server running on port 5600'));
+app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
